@@ -1,8 +1,4 @@
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 public class NewJFrame extends javax.swing.JFrame {
@@ -27,8 +23,7 @@ public class NewJFrame extends javax.swing.JFrame {
         cancelButton = new javax.swing.JButton();
         comprimirButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jProgressBar1 = new javax.swing.JProgressBar();
-        jLabel2 = new javax.swing.JLabel();
+        progress = new javax.swing.JProgressBar();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -112,8 +107,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addContainerGap(38, Short.MAX_VALUE))
         );
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("0%");
+        progress.setStringPainted(true);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -121,18 +115,14 @@ public class NewJFrame extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(progress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(progress, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33))
         );
 
@@ -188,9 +178,10 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         }
         dirOutput.setText(outputName);
-        if (jProgressBar1.getValue() != 0) {
-            jProgressBar1.setValue(0);
-            jLabel2.setText("0%");
+        if (progress.getValue() != 0) {
+            progress.setValue(0);
+            
+            progress.setString("0%");
         }
     }//GEN-LAST:event_outputButtonActionPerformed
 
@@ -202,9 +193,9 @@ public class NewJFrame extends javax.swing.JFrame {
             inputName = fc.getSelectedFile().getAbsolutePath();
             dirInput.setText(inputName);
             outputButton.setEnabled(true);
-            if (jProgressBar1.getValue() != 0) {
-                jProgressBar1.setValue(0);
-                jLabel2.setText("0%");
+            if (progress.getValue() != 0) {
+                progress.setValue(0);
+                progress.setString("0%");
             }
         }
     }//GEN-LAST:event_inputButtonActionPerformed
@@ -212,19 +203,8 @@ public class NewJFrame extends javax.swing.JFrame {
     private void comprimirButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprimirButtonActionPerformed
         // TODO add your handling code here:
         cancelButton.setEnabled(true);
-        Comprimir task = new Comprimir(inputName, outputName);
-        jProgressBar1.setValue(0);
-        jLabel2.setText("0%");
-        task.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("progress".equals(evt.getPropertyName())) {
-                    
-                    jProgressBar1.setValue((Integer) evt.getNewValue());
-                    jLabel2.setText(String.valueOf(jProgressBar1.getValue()) + "%");
-                    
-                }
-            }
-        });
+        Comprimir task = new Comprimir(inputName, outputName, progress);
+        
         task.execute();
         cancelButton.setEnabled(false);
     }//GEN-LAST:event_comprimirButtonActionPerformed
@@ -273,12 +253,11 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JTextField dirOutput;
     private javax.swing.JButton inputButton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JButton outputButton;
+    private javax.swing.JProgressBar progress;
     // End of variables declaration//GEN-END:variables
 
 
