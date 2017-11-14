@@ -26,6 +26,7 @@ public class NewJFrame extends javax.swing.JFrame {
         initComponents();
         fc = new JFileChooser(".");
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        zips=0;
     }
 
     @SuppressWarnings("unchecked")
@@ -281,6 +282,7 @@ public class NewJFrame extends javax.swing.JFrame {
     private String outputName;
     private JFileChooser fc;
     private Comprimir task;
+    private int zips;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton comprimirButton;
@@ -333,6 +335,7 @@ public class NewJFrame extends javax.swing.JFrame {
         @Override
         protected void done(){
             cancelButton.setEnabled(false);
+            zips++;
         }
 
         public void zip() throws FileNotFoundException, IOException {
@@ -347,7 +350,7 @@ public class NewJFrame extends javax.swing.JFrame {
             try {
                 BufferedInputStream origin;
 
-                FileOutputStream dest = new FileOutputStream(outputFolder + "\\folder.zip");
+                FileOutputStream dest = new FileOutputStream(outputFolder + "\\folder" + zips + ".zip");
                 ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
                 int zippedFiles = 0;
                 byte[] data = new byte[BUFFER_SIZE];
