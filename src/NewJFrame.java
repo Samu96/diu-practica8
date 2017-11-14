@@ -1,5 +1,24 @@
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import javax.swing.JFileChooser;
+import javax.swing.SwingWorker;
 
 public class NewJFrame extends javax.swing.JFrame {
 
@@ -77,6 +96,11 @@ public class NewJFrame extends javax.swing.JFrame {
 
         cancelButton.setText("Cancelar");
         cancelButton.setEnabled(false);
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
         comprimirButton.setText("Comprimir");
         comprimirButton.setEnabled(false);
@@ -180,7 +204,7 @@ public class NewJFrame extends javax.swing.JFrame {
         dirOutput.setText(outputName);
         if (progress.getValue() != 0) {
             progress.setValue(0);
-            
+
             progress.setString("0%");
         }
     }//GEN-LAST:event_outputButtonActionPerformed
@@ -203,11 +227,21 @@ public class NewJFrame extends javax.swing.JFrame {
     private void comprimirButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprimirButtonActionPerformed
         // TODO add your handling code here:
         cancelButton.setEnabled(true);
-        Comprimir task = new Comprimir(inputName, outputName, progress);
-        
+        task = new Comprimir(inputName, outputName);
+
         task.execute();
-        cancelButton.setEnabled(false);
+
     }//GEN-LAST:event_comprimirButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        task.cancel(true);
+        cancelButton.setEnabled(false);
+        try {
+            Files.deleteIfExists(Paths.get(outputName + "\\folder.zip"));
+        } catch (IOException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -246,6 +280,7 @@ public class NewJFrame extends javax.swing.JFrame {
     private String inputName;
     private String outputName;
     private JFileChooser fc;
+    private Comprimir task;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton comprimirButton;
@@ -260,5 +295,87 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JProgressBar progress;
     // End of variables declaration//GEN-END:variables
 
+    public class Comprimir extends SwingWorker<Void, Integer> {
 
+        private String inputFolder;
+        private String outputFolder;
+        private final int BUFFER_SIZE = 1024;
+
+        public Comprimir(String inpurFolder, String outputFolder) {
+            this.inputFolder = inpurFolder;
+            this.outputFolder = outputFolder;
+            progress.setValue(0);
+            progress.setString("0%");
+            progress.setStringPainted(true);
+            addPropertyChangeListener(new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if ("progress".equals(evt.getPropertyName())) {
+                        progress.setValue((Integer) evt.getNewValue());
+                        progress.setString(String.valueOf(progress.getValue()) + "%");
+
+                    }
+                }
+            });
+        }
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            zip();
+            return null;
+
+        }
+
+        @Override
+        protected void process(List<Integer> chunks) {
+            setProgress(chunks.get(chunks.size() - 1));
+        }
+        
+        @Override
+        protected void done(){
+            cancelButton.setEnabled(false);
+        }
+
+        public void zip() throws FileNotFoundException, IOException {
+            File folder = new File(inputFolder);
+            File[] listOfFiles = folder.listFiles();
+            List<String> files = new ArrayList<>();
+            for (int i = 0; i < listOfFiles.length; i++) {
+                if (listOfFiles[i].isFile()) {
+                    files.add(listOfFiles[i].getAbsolutePath());
+                }
+            }
+            try {
+                BufferedInputStream origin;
+
+                FileOutputStream dest = new FileOutputStream(outputFolder + "\\folder.zip");
+                ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+                int zippedFiles = 0;
+                byte[] data = new byte[BUFFER_SIZE];
+                Iterator i = files.iterator();
+                while (i.hasNext() && !isCancelled()) {
+
+                    String filename = (String) i.next();
+                    FileInputStream fi = new FileInputStream(filename);
+                    origin = new BufferedInputStream(fi, BUFFER_SIZE);
+
+                    ZipEntry entry = new ZipEntry(filename.substring(filename.lastIndexOf('\\') + 1));
+
+                    out.putNextEntry(entry);
+                    int count;
+                    while ((count = origin.read(data, 0, BUFFER_SIZE)) > 0) {
+                        out.write(data, 0, count);
+                    }
+                    out.closeEntry();
+                    origin.close();
+                    zippedFiles++;
+                    publish(100 * zippedFiles / files.size());
+                }
+
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
