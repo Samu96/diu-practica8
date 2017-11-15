@@ -106,8 +106,14 @@
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JTextField" name="dirInput">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="dirOutput">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="inputButton">
           <Properties>

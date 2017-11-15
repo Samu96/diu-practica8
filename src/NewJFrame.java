@@ -49,6 +49,10 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jLabel1.setText("Samuel del pino Rodríguez Grimón,  Aitor García Hernandez");
 
+        dirInput.setEnabled(false);
+
+        dirOutput.setEnabled(false);
+
         inputButton.setText("Seleccionar...");
         inputButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
