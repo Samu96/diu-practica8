@@ -238,7 +238,7 @@ public class NewJFrame extends javax.swing.JFrame {
         task.cancel(true);
         cancelButton.setEnabled(false);
         try {
-            Files.deleteIfExists(Paths.get(outputName + "\\folder.zip"));
+            Files.deleteIfExists(Paths.get(outputName + "\\folder" + (--zips) + ".zip"));
         } catch (IOException ex) {
             Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
